@@ -1,0 +1,147 @@
+version: 2
+
+models:
+  - name: fct_command_statuses
+    description: "Command Statuses"
+    columns:
+      - name: command_uuid
+        description: "A unique identifier of a command. The primary key for this table"
+        tests:
+          - not_null
+          - unique
+      - name: device_id
+        description: "The device_id of the targeted device"
+        tests:
+          - exists
+      - name: command
+        description: "The command issued"
+        tests:
+          - exists
+      - name: command_client
+        description: "The type of client that issued this command"
+        tests:
+          - exists
+      - name: thermostat_heat_set_point
+        description: "The Heat Set Point specified by this command for the targeted thermostat. Provided as an integer or float value indicating the Set Point in degrees-F vs. C is not provided"
+        tests:
+          - exists
+      - name: thermostat_cool_set_point
+        description: "The Cool Set Point specified by this command for the targeted thermostat Provided as an integer or float value indicating the Set Point in degrees-F vs. C is not provided"
+        tests:
+          - exists
+      - name: thermostat_mode
+        description: "The Mode (Off/Cool/Heat/Auto) specified by this command for the targeted thermostat"
+        tests:
+          - exists
+      - name: slot
+        description: "The Slot on the lock under which the `Pin` (used to open the lock) is stored"
+        tests:
+          - exists
+      - name: pin
+        description: "The Pin to be stored in the provided Slot"
+        tests:
+          - exists
+      - name: switch_state
+        description: "The Switch State (on/off) specified by this command for the targeted light switch"
+        tests:
+          - exists
+      - name: lock_state
+        description: "The Lock State (locked/unlocked) specified by this command for the targeted door lock"
+        tests:
+          - exists
+      - name: user_id
+        description: "The user_id of the user that issued this command"
+        tests:
+          - exists
+      - name: command_timestamp
+        description: "Timestamp produced by the cloudapi when the command was written to Twilio Sync"
+        tests:
+          - exists
+      - name: active_timestamp
+        description: "Timestamp produced by the hub when the hub picked up the command from Twilio Sync (MQTT)"
+        tests:
+          - exists
+      - name: command_active_node_id
+        description: "The node id on the hub to which the command was planned to be dispatched"
+        tests:
+          - exists
+      - name: command_result_node_id
+        description: "The node id on the hub to which the command was dispatched"
+        tests:
+          - exists
+      - name: is_hub_success
+        description: "Boolean for whether CommandResult is True"
+        tests:
+          - exists
+      - name: has_hub_response
+        description: "Boolean for whether the command has a CommandResult response from the hub"
+        tests:
+          - exists
+      - name: command_update_timestamp
+        description: "Timestamp produced by Twilio Sync when the Command was written to Sync Map"
+        tests:
+          - exists
+      - name: active_update_timestamp
+        description: "Timestamp produced by Twilio Sync when the CommandActive was written to Sync Map"
+        tests:
+          - exists
+      - name: result_update_timestamp
+        description: "Timestamp produced by Twilio Sync when the CommandResult was written to the device Sync Map "
+        tests:
+          - exists
+      - name: command_origin
+        description: "Class of the entity within CloudAPI that produced the command. For example: ActivatedCommunitySchedules"
+        tests:
+          - exists
+      - name: command_origin_id
+        description: "CloudAPI database uid for the db entity that produced this command."
+        tests:
+          - exists
+      - name: _raw_command_desired_state
+        description: "The raw JSON of the command"
+        tests:
+          - not_null
+
+  - name: dim_users
+    description: "Users"
+    columns:
+      - name: user_id
+        description: "The user id"
+        tests:
+          - not_null
+          - unique
+      - name: username
+        description: "The user's username"
+        tests:
+          - not_null
+          - unique
+      - name: date_registered
+        description: "Timestamp when a user first registered an account"
+        tests:
+          - not_null
+      - name: last_modified
+        description: "Timestamp when the user record was last modified"
+        tests:
+          - not_null
+
+  - name: met_daily_command_count_by_username
+    description: "Metric table counting commands issued daily by user_id"
+    columns:
+      - name: username
+        description: "The username that issued the commands"
+        tests:
+          - not_null
+      - name: number_of_commands
+        description: "The total number of commands issued by the username on the timestamp_date"
+        tests:
+          - not_null
+      - name: number_of_successful_commands
+        description: "The number of commands issued by the username on the timestamp_date for which is_hub_success is True"
+        tests:
+          - exists
+      - name: timestamp_date
+        description: "Timestamp at the start of the day for which we've counted commands"
+        tests:
+          - not_null
+
+

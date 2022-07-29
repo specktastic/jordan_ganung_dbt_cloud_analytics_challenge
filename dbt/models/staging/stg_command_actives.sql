@@ -1,98 +1,33 @@
-with column_renames as (
-  select
-    EventType as event_type
-    ,DateCreated as update_timestamp
-    ,MapRevision as map_revision
-    ,ItemKey as item_key
-    ,ItemRevision as item_revision
-    ,EndpointId as twilio_sync_endpoint_id
-    ,ItemData as item_data
-    ,MapUniqueName as  device_id
-
-    ,_source_file
-    ,concat(MapUniqueName, '_', MapRevision, '_', STRING(DateCreated)) as _uid
-  from
-    {{ source('interview_source', 'raw_sync_events') }}
+with sync_events_parsed as (
+  select * from {{ ref('sync_events_parsed') }}
 )
-,extract_event_values as (
-  select
-    *
 
-    ,JSON_EXTRACT_SCALAR(item_data, '$.uuid') as event_uuid
-    ,JSON_EXTRACT_SCALAR(item_data, '$.desired_state[0]') as command
-
-    ,case
-     when JSON_EXTRACT_SCALAR(item_data, '$.timestamp') is not null and CHAR_LENGTH(JSON_EXTRACT_SCALAR(item_data, '$.timestamp')) < 26
-      then safe_cast(JSON_EXTRACT_SCALAR(item_data, '$.timestamp') as timestamp)
-      when JSON_EXTRACT_SCALAR(item_data, '$.timestamp') is not null and CHAR_LENGTH(JSON_EXTRACT_SCALAR(item_data, '$.timestamp')) > 26
-      then safe_cast(substr(JSON_EXTRACT_SCALAR(item_data, '$.timestamp'),0,26) as timestamp)
-    end as event_timestamp
-
-    ,case when item_key in ('Command') then
-      JSON_EXTRACT(item_data, '$.desired_state')
-      else null
-    end as _raw_command_desired_state
-    ,case when item_key in ('Command') then
-      JSON_EXTRACT_SCALAR(item_data, '$.client')
-      else null
-    end as command_client
-    ,case when item_key in ('Command') then
-      JSON_EXTRACT_SCALAR(item_data, '$.user')
-      else null
-    end as command_user
-    ,case when item_key in ('Command') then
-      JSON_EXTRACT_SCALAR(item_data, '$.origin')
-      else null
-     end as command_origin
-    ,case when item_key in ('Command') then
-      JSON_EXTRACT_SCALAR(item_data, '$.origin_id')
-      else null
-     end as command_origin_id
-
-    ,case when item_key in ('CommandResult') then
-      JSON_EXTRACT_SCALAR(item_data, '$.result')
-      else null
-    end as command_result
-    ,case when item_key in ('CommandResult') then
-      JSON_EXTRACT_SCALAR(item_data, '$.failure_string')
-      else null
-    end as command_failure_string
-
-    ,case when item_key in ('CommandActive', 'CommandResult') then
-      JSON_EXTRACT_SCALAR(item_data, '$.node_id')
-      else null
-    end as command_node_id
-
-    ,case when item_key in ('Command', 'CommandActive', 'CommandResult') then
-      case
-        when JSON_EXTRACT_SCALAR(item_data, '$.command_id') is not null
-        then JSON_EXTRACT_SCALAR(item_data, '$.command_id')
-        else JSON_EXTRACT_SCALAR(item_data, '$.uuid')
-      end
-      else null
-    end as command_uuid
-
-
-  from
-    column_renames
+# this step removed duplicate command_uuid entries by only taking the 1st event 
+,removing_duplicates as (
+  select 
+    *, 
+    ROW_NUMBER() OVER (PARTITION BY command_uuid, item_key ORDER BY update_timestamp ASC) AS row_number
+  FROM sync_events_parsed
 )
+
 ,final as (
     select
       command_uuid
       ,command_node_id
-
       ,update_timestamp
       ,event_timestamp
       ,device_id
-
-      ,_uid
+      --,_uid
       ,_source_file
     from
-      extract_event_values
+      removing_duplicates
     where
       item_key = 'CommandActive'
       and command_uuid is not null
+      and row_number = 1
 )
 
 select *
 from final
+
+

@@ -38,6 +38,10 @@ models:
                     - part_two
         marts:
             fct_command_statuses:
+            
+                +cluster_by:
+                    - "command_uuid"
+                    - "item_key"
                 +tags:
                     - part_one
             dim_users:

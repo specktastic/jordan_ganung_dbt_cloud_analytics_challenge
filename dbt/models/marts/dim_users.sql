@@ -1,8 +1,11 @@
 
--- REPLACE the contents of this file with your query
-with final as (
-    select 1 as placeholder
+with users as (
+    SELECT * FROM {{ ref('stg_users') }}
 )
 
-select *
-from final
+select 
+    user_id
+    ,username
+    ,date_registered
+    ,last_modified
+from users

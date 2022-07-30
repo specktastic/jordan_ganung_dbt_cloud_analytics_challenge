@@ -100,7 +100,59 @@ models:
       - name: _raw_command_desired_state
         description: "The raw JSON of the command"
         tests:
-          - not_null
+          - exists
+      - name: humidity_array
+        description: "An array that contains the humidity sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: battery_level_array
+        description: "An array that contains the battery_level_array sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: temperature_array
+        description: "An array that contains the temperature sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: thermostat_operating_state_array
+        description: "An array that contains the thermostat_operating_state sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: thermostat_cool_setpoint_value_array
+        description: "An array that contains the thermostat_cool_setpoint_value sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: thermostat_cool_setpoint_unit_array
+        description: "An array that contains the thermostat_cool_setpoint_unit sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: thermostat_heat_setpoint_value_array
+        description: "An array that contains the thermostat_heat_setpoint_value sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: thermostat_heat_setpoint_unit_array
+        description: "An array that contains the thermostat_heat_setpoint_unit sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: thermostat_mode_sensor_array
+        description: "An array that contains the thermostat_mode_sensor sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: switch_array
+        description: "An array that contains the switch sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: door_locked_array
+        description: "An array that contains the door_locked sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: dimmer_switch_array
+        description: "An array that contains the dimmer_switch sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
+      - name: dimmer_percent_array
+        description: "An array that contains the dimmer_percent sensor readings in the 15 seconds that followed the command"
+        tests:
+          - exists
 
   - name: dim_users
     description: "Users"

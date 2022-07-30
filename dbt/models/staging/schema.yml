@@ -177,6 +177,14 @@ models:
         description: "The source file that this update was in on it's way to our data warehouse"
         tests:
           - exists
+      - name: dimmer_state
+        description: "the dimmer state specified by the command"
+        tests:
+          - exists
+      - name: dimmer_percent
+        description: "the dimmer state specified by the commandd"
+        tests:
+          - exists
   - name: stg_command_actives
     description: "CommandActive responses from hubs"
     columns:
@@ -254,3 +262,98 @@ models:
         description: "A timestamp when the user record was last modified"
         tests:
           - not_null
+
+  - name: stg_event_sensor_readings
+    description: "Sensor readings from raw_sync_events that currently contains readings from item_key in ('Humidity', 'Temperature', 'BatteryLevel')"
+    columns: 
+      - name: sensor_uuid
+        description: "A unique identifier of a sensor message. The primary key for this table"
+        tests: 
+          - not_null
+          - unique
+      - name: update_timestamp
+        description: "Timestamp from Twilio recording when the device map was updated by the hub or the cloud, drawn from the DateCreated field of raw_sync_events"
+        tests: 
+          - not_null
+      - name: event_timestamp
+        description: "Timestamp generated at the client for this event"
+        tests: 
+          - not_null
+      - name: device_id
+        description: "The device_id of the targeted device"
+        tests: 
+          - not_null
+      - name: item_key
+        description: "The key of the item in the map that was added, updated, or removed."
+        tests: 
+          - not_null
+      - name: humidity
+        description: "The parsed sensor reading from item data when the the itemkey = 'humidity'"
+        tests: 
+          - exists
+      - name: temperature
+        description: "The parsed sensor reading from item data when the the itemkey = 'temperature'"
+        tests: 
+          - exists
+      - name: temp_unit_of_measure
+        description: "The parsed temperature unit of measure from item data when the the itemkey = 'temperature'"
+        tests: 
+          - exists
+      - name: temp_raw
+        description: "The combined temperature and unit of measure pared from itemdata when the the itemkey = 'temperature'"
+        tests: 
+          - exists
+      - name: battery_level
+        description: "The parsed battery level from item data when the the itemkey = 'batterylevel'"
+        tests: 
+          - exists 
+      - name: thermostat_operating_state
+        description: "The parsed thermostat_operating_state from item data when the the itemkey = 'thermostat_operating_state'"
+        tests: 
+          - exists
+      - name: thermostat_cool_setpoint_value
+        description: "The parsed thermostat_cool_setpoint_value from item data when the the itemkey = 'thermostat_cool_setpoint_value'"
+        tests: 
+          - exists
+      - name: thermostat_cool_setpoint_unit
+        description: "The parsed thermostat_cool_setpoint_unit from item data when the the itemkey = 'thermostat_cool_setpoint_unit'"
+        tests: 
+          - exists
+      - name: thermostat_cool_setpoint_raw
+        description: "The parsed thermostat_cool_setpoint_raw from item data when the the itemkey = 'thermostat_cool_setpoint_raw'"
+        tests: 
+          - exists
+      - name: thermostat_heat_setpoint_value
+        description: "The parsed thermostat_heat_setpoint_value from item data when the the itemkey = 'thermostat_heat_setpoint_value'"
+        tests: 
+          - exists
+      - name: thermostat_heat_setpoint_unit
+        description: "The parsed thermostat_heat_setpoint_unit from item data when the the itemkey = 'thermostat_heat_setpoint_unit'"
+        tests: 
+          - exists
+      - name: thermostat_heat_setpoint_raw
+        description: "The parsed thermostat_heat_setpoint_raw from item data when the the itemkey = 'thermostat_heat_setpoint_raw'"
+        tests: 
+          - exists
+      - name: thermostat_mode_sensor
+        description: "The parsed thermostat_mode_sensor from item data when the the itemkey = 'thermostat_mode_sensor'"
+        tests: 
+          - exists
+      - name: switch
+        description: "The parsed switch status from item data when the the itemkey = 'switch'"
+        tests: 
+          - exists
+      - name: door_locked
+        description: "The parsed door_locked status from item data when the the itemkey = 'door_locked'"
+        tests: 
+          - exists
+      - name: dimmer_switch
+        description: "The parsed dimmer_switch status from item data when the the itemkey = 'dimmer_switch'"
+        tests: 
+          - exists
+      - name: dimmer_percent_reading 
+        description: "The parsed dimmer_percent from item data when the the itemkey = 'dimmer_percent'"
+        tests: 
+          - exists
+
+

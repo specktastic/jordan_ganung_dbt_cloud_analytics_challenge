@@ -79,6 +79,12 @@ with sync_events as (
       else null
     end as command_uuid
 
+    ,case when item_key in ('Humidity', 'Temperature', 'BatteryLevel',  'ThermostatOperatingState',  'ThermostatCoolSetpoint', 'ThermostatHeatSetpoint', 'ThermostatMode', 'Switch', 'DoorLocked', 'Dimmer') 
+    then JSON_EXTRACT_SCALAR(item_data, '$.uuid')
+      else null
+    end as sensor_uuid
+
+
     -- NEW COLUMNS PARSING `$.desired_state` from item_data CAN BE ADDED HERE --
     ,case 
         when item_key in ('Command')
@@ -121,10 +127,108 @@ with sync_events as (
         AND JSON_EXTRACT_SCALAR(item_data, '$.desired_state[0]') = 'LockedState'
         then JSON_EXTRACT_SCALAR(item_data, '$.desired_state[1]')
         end AS lock_state
+
+,case 
+        when item_key in ('Command')
+        and JSON_EXTRACT_SCALAR(item_data, '$.desired_state[0]') = 'DimmerState' -- this is the command field from above
+        then JSON_EXTRACT_SCALAR(item_data, '$.desired_state[1]')
+        end AS dimmer_state 
+
+,case 
+        when item_key in ('Command')
+        and JSON_EXTRACT_SCALAR(item_data, '$.desired_state[0]') = 'DimmerState' -- this is the command field from above
+        then JSON_EXTRACT_SCALAR(item_data, '$.desired_state[2]')
+        end AS dimmer_percent
+
+    ,case 
+        when item_key in ('Humidity')
+        then JSON_EXTRACT_SCALAR(item_data, '$.state')
+        end AS humidity
+
+,case 
+        when item_key in ('Temperature')
+        then json_extract_scalar(item_data, '$.state.value')
+        end AS temperature
+
+,case 
+        when item_key in ('Temperature')
+        then json_extract_scalar(item_data, '$.state.unit')
+        end AS temp_unit_of_measure
+
+,case 
+        when item_key in ('Temperature')
+        then json_extract(item_data, '$.state')
+        end AS temp_raw
+
+,case 
+        when item_key in ('BatteryLevel')
+        then json_extract_scalar(item_data, '$.state')
+        end AS battery_level
     
+,case 
+        when item_key in ('ThermostatOperatingState')
+        then json_extract_scalar(item_data, '$.state')
+        end AS thermostat_operating_state
+
+,case 
+        when item_key in ('ThermostatCoolSetpoint')
+        then json_extract_scalar(item_data, '$.state.value')
+        end AS thermostat_cool_setpoint_value
+        
+,case 
+        when item_key in ('ThermostatCoolSetpoint')
+        then json_extract_scalar(item_data, '$.state.unit')
+        end AS thermostat_cool_setpoint_unit
+
+,case 
+        when item_key in ('ThermostatCoolSetpoint')
+        then json_extract(item_data, '$.state')
+        end AS thermostat_cool_setpoint_raw
+
+,case 
+        when item_key in ('ThermostatHeatSetpoint')
+        then json_extract_scalar(item_data, '$.state.value')
+        end AS thermostat_heat_setpoint_value
+,case 
+        when item_key in ('ThermostatHeatSetpoint')
+        then json_extract_scalar(item_data, '$.state.unit')
+        end AS thermostat_heat_setpoint_unit
+
+,case 
+        when item_key in ('ThermostatHeatSetpoint')
+        then json_extract(item_data, '$.state')
+        end AS thermostat_heat_setpoint_raw
+
+,case 
+        when item_key in ('ThermostatMode')
+        then json_extract_scalar(item_data, '$.state')
+        end AS thermostat_mode_sensor
+
+,case 
+        when item_key in ('Switch')
+        then json_extract_scalar(item_data, '$.state.value')
+        end AS switch
+
+,case 
+        when item_key in ('DoorLocked')
+        then json_extract_scalar(item_data, '$.state')
+        end AS door_locked
+
+,case 
+        when item_key in ('Dimmer')
+        then json_extract_scalar(item_data, '$.state.value')
+        end AS dimmer_switch
+
+,case 
+        when item_key in ('Dimmer')
+        then json_extract_scalar(item_data, '$.state.percent')
+        end AS dimmer_percent_reading
   from
     column_renames
 )
 
 SELECT * FROM extract_event_values
+
+
+
 

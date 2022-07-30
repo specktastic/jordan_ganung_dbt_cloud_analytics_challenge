@@ -42,6 +42,8 @@ with sync_events_parsed as (
   ,pin		
   ,switch_state		
   ,lock_state
+  ,dimmer_state
+  ,dimmer_percent
   from
     removing_duplicates
   where
